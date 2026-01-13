@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RYVN</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            font-family: 'Orbitron', sans-serif;
+            background: #000;
+        }
+
+
+        .video-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+        }
+
+
+        /* fallback image if video fails */
+        .video-bg video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+        }
+
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            z-index: -1;
+        }
+
+        .content {
+            position: relative;
+            z-index: 10;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 8vw, 6rem);
+            margin-bottom: 1rem;
+            text-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
+        }
+
+        p {
+            font-size: clamp(1.1rem, 4vw, 1.6rem);
+            max-width: 700px;
+            margin-bottom: 2.5rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+        }
+
+        .neon-btn {
+            padding: 1rem 3rem;
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #fff;
+            background: transparent;
+            border: 2px solid transparent;
+            border-image: linear-gradient(45deg, #8a2be2, #00f0ff) 1;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0 0 15px rgba(138, 43, 226, 0.6), 0 0 30px rgba(0, 240, 255, 0.4);
+        }
+
+        .neon-btn:hover,
+        .neon-btn:active {
+            box-shadow: 0 0 25px rgba(138, 43, 226, 0.9), 0 0 50px rgba(0, 240, 255, 0.7);
+            transform: scale(1.05);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 1000;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .modal-content {
+            min-height: 100%;
+            padding: 4rem 2rem;
+            color: white;
+            text-align: center;
+        }
+
+        .toggle-container {
+            position: absolute;
+            top: 5%;
+            left: 5%;
+            z-index: 30;
+            cursor: pointer;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 90px;
+            height: 45px;
+            background: #1a1a1a;
+            border-radius: 50px;
+            border: 2px solid #8a2be2;
+            box-shadow: 0 0 15px rgba(138, 43, 226, 0.5);
+            transition: all 0.4s;
+        }
+
+        .toggle-knob {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: 37px;
+            height: 37px;
+            background: linear-gradient(135deg, #00f0ff, #8a2be2);
+            border-radius: 50%;
+            box-shadow: 0 0 20px #00f0ff, inset 0 0 10px #fff;
+            transition: all 0.4s;
+        }
+
+        .toggle-container.active .toggle-knob {
+            transform: translateX(45px);
+            background: linear-gradient(135deg, #8a2be2, #00f0ff);
+            box-shadow: 0 0 25px #8a2be2;
+        }
+
+        .spotlight-beam {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, transparent 0%, transparent 15%, rgba(255, 255, 255, 0.32) 22%, rgba(255, 255, 255, 0.20) 40%, transparent 70%);
+            pointer-events: none;
+            opacity: 1;
+            transition: opacity 0.8s ease;
+            filter: blur(12px);
+            mix-blend-mode: screen;
+        }
+
+        .modal.dark .spotlight-beam {
+            opacity: 0;
+        }
+
+        .light-buttons {
+            position: absolute;
+            top: 50%;
+            left: 6%;
+            transform: translateY(-50%);
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.2rem;
+            z-index: 20;
+            transition: opacity 0.8s ease;
+        }
+
+        .image-btn {
+            width: 110px;
+            height: 110px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 18px;
+            cursor: pointer;
+            box-shadow: 0 0 25px rgba(138, 43, 226, 0.6), 0 0 50px rgba(0, 240, 255, 0.4);
+            transition: all 0.4s;
+        }
+
+        .image-btn:hover,
+        .image-btn:active {
+            transform: scale(1.12);
+            box-shadow: 0 0 45px rgba(138, 43, 226, 0.9), 0 0 90px rgba(0, 240, 255, 0.7);
+        }
+
+        .dark-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+            pointer-events: none;
+        }
+
+        .fb-icon {
+            width: 120px;
+            height: 120px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            margin: 0 auto 1.5rem;
+            filter: drop-shadow(0 0 20px #1877f2);
+            transition: transform 0.3s;
+        }
+
+        .fb-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .fb-text h2 {
+            font-size: 2.5rem;
+            color: #1877f2;
+            text-shadow: 0 0 15px #1877f2;
+            margin-bottom: 1rem;
+        }
+
+        .fb-text p {
+            font-size: 1.3rem;
+            max-width: 500px;
+        }
+
+        .modal.light .light-buttons {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal.dark .light-buttons {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .modal.dark .dark-content {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .ryv-text {
+            position: absolute;
+            top: 50%;
+            right: 6%;
+            transform: translateY(-50%);
+            font-size: clamp(3.5rem, 9vw, 8rem);
+            font-weight: 900;
+            color: white;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.8), 0 0 60px rgba(138, 43, 226, 0.5);
+            letter-spacing: 0.5rem;
+            opacity: 1;
+            transition: opacity 0.8s ease;
+        }
+
+        .modal.dark .ryv-text {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .toggle-container {
+                top: 4%;
+                left: 4%;
+            }
+
+            .toggle-switch {
+                width: 70px;
+                height: 35px;
+            }
+
+            .toggle-knob {
+                width: 27px;
+                height: 27px;
+            }
+
+            .toggle-container.active .toggle-knob {
+                transform: translateX(35px);
+            }
+
+            .light-buttons {
+                left: 50%;
+                transform: translate(-50%, -50%);
+                top: 35%;
+                gap: 1rem;
+            }
+
+            .image-btn {
+                width: 90px;
+                height: 90px;
+            }
+
+            .ryv-text {
+                top: 65%;
+                right: 50%;
+                transform: translate(50%, -50%);
+                font-size: clamp(4rem, 14vw, 7rem);
+            }
+
+            .fb-icon {
+                width: 100px;
+                height: 100px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="video-bg">
+        <video id="bgVideo" autoplay muted loop playsinline preload="auto">
+            <source src="background.mp4" type="video/mp4">
+
+        </video>
+
+    </div>
+
+    <div class="overlay"></div>
+
+    <div class="content">
+        <h1>RYV Experience</h1>
+        <p>Tap anywhere or click ENTER to start the experience (video loads agad pag may interaction).</p>
+        <button class="neon-btn" onclick="openModal()">ENTER</button>
+    </div>
+
+    <!-- Main Modal -->
+    <div id="myModal" class="modal light">
+        <div class="modal-content">
+            <div class="toggle-container" onclick="toggleMode()">
+                <div class="toggle-switch">
+                    <div class="toggle-knob"></div>
+                </div>
+            </div>
+
+            <div class="spotlight-beam"></div>
+
+            <div class="light-buttons">
+                <!-- 1: Cool combined HTML/CSS/JS neon -->
+                <div class="image-btn"
+                    style="background-image: url('https://img.freepik.com/premium-vector/neon-double-square-frame_515038-24750.jpg');"
+                    onclick="openModal1()"></div>
+                <!-- 2: CSS neon logo -->
+                <div class="image-btn"
+                    style="background-image: url('https://thumbs.dreamstime.com/b/glowing-neon-line-css-file-document-download-css-button-icon-isolated-black-background-css-file-symbol-colorful-outline-glowing-207095638.jpg');"
+                    onclick="openModal2()"></div>
+                <!-- 3: JS neon logo -->
+                <div class="image-btn"
+                    style="background-image: url('https://thumbs.dreamstime.com/b/glowing-neon-line-js-file-document-download-button-icon-isolated-black-background-symbol-colorful-outline-concept-vector-208577592.jpg');"
+                    onclick="openModal3()"></div>
+                <!-- 4: Bonus neon square -->
+                <div class="image-btn"
+                    style="background-image: url('https://images.stockcake.com/public/e/8/d/e8def305-ee76-432c-97ff-f2ab152ae8af/cyberpunk-digital-frame-stockcake.jpg');"
+                    onclick="openModal4()"></div>
+            </div>
+
+            <div class="dark-content">
+                <a href="https://www.facebook.com/yourusername" target="_blank" style="text-decoration: none;">
+                    <div class="fb-icon"
+                        style="background-image: url('https://images.stockcake.com/public/6/9/c/69c4c78a-1838-44d7-bcf9-e714ad7e4887_medium/neon-facebook-glow-stockcake.jpg');">
+                    </div>
+                </a>
+                <div class="fb-text">
+                    <h2>Connect with RYV</h2>
+                    <p>Follow me on Facebook for updates, exclusives, and more neon vibes! Tap the icon above.</p>
+                </div>
+            </div>
+
+            <div class="ryv-text">RYV</div>
+        </div>
+    </div>
+
+    <!-- Modals (same as before) -->
+    <div id="modal1" class="modal">
+        <div class="modal-content">
+            <h2 style="color: #00ff41; text-shadow: 0 0 30px #00ff41;">COOL THEME ZONE</h2>
+            <p style="margin: 2rem 0; line-height: 1.6;">HTML + CSS + JS combined – your all-in-one neon experience!</p>
+            <button class="neon-btn" style="margin-top: 3rem;" onclick="closeModal1()">BACK</button>
+        </div>
+    </div>
+
+    <div id="modal2" class="modal">
+        <div class="modal-content">
+            <h2 style="color: #00ff41; text-shadow: 0 0 30px #00ff41;">CSS ZONE</h2>
+            <p style="margin: 2rem 0; line-height: 1.6;">Style the future with glowing CSS magic.</p>
+            <button class="neon-btn" style="margin-top: 3rem;" onclick="closeModal2()">BACK</button>
+        </div>
+    </div>
+
+    <div id="modal3" class="modal">
+        <div class="modal-content">
+            <h2 style="color: #00ff41; text-shadow: 0 0 30px #00ff41;">JS ZONE</h2>
+            <p style="margin: 2rem 0; line-height: 1.6;">Interactive JavaScript power – make it alive!</p>
+            <button class="neon-btn" style="margin-top: 3rem;" onclick="closeModal3()">BACK</button>
+        </div>
+    </div>
+
+    <div id="modal4" class="modal">
+        <div class="modal-content">
+            <h2 style="color: #00ff41; text-shadow: 0 0 30px #00ff41;">BONUS ZONE</h2>
+            <p style="margin: 2rem 0; line-height: 1.6;">Extra neon surprises await...</p>
+            <button class="neon-btn" style="margin-top: 3rem;" onclick="closeModal4()">BACK</button>
+        </div>
+    </div>
+
+    <script>
+        const mainModal = document.getElementById('myModal');
+        const toggleContainer = document.querySelector('.toggle-container');
+        const bgVideo = document.getElementById('bgVideo');
+
+        // Try play on load + interaction
+        function tryPlayVideo() {
+            bgVideo.play().catch(err => {
+                console.log("Autoplay blocked:", err);
+                // Fallback: wait for user tap
+                document.body.addEventListener('touchstart', () => bgVideo.play(), { once: true });
+                document.body.addEventListener('click', () => bgVideo.play(), { once: true });
+            });
+        }
+
+        window.addEventListener('load', tryPlayVideo);
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') tryPlayVideo();
+        });
+
+        function openModal() {
+            mainModal.style.display = 'block';
+            tryPlayVideo(); // extra force on click
+        }
+
+        function toggleMode() {
+            toggleContainer.classList.toggle('active');
+            mainModal.classList.toggle('light');
+            mainModal.classList.toggle('dark');
+        }
+
+        function openModal1() { document.getElementById('modal1').style.display = 'block'; }
+        function openModal2() { document.getElementById('modal2').style.display = 'block'; }
+        function openModal3() { document.getElementById('modal3').style.display = 'block'; }
+        function openModal4() { document.getElementById('modal4').style.display = 'block'; }
+
+        function closeModal1() { document.getElementById('modal1').style.display = 'none'; }
+        function closeModal2() { document.getElementById('modal2').style.display = 'none'; }
+        function closeModal3() { document.getElementById('modal3').style.display = 'none'; }
+        function closeModal4() { document.getElementById('modal4').style.display = 'none'; }
+
+        mainModal.addEventListener('click', function (e) {
+            if (e.target === mainModal) {
+                mainModal.style.display = 'none';
+                toggleContainer.classList.add('active');
+                mainModal.classList.add('light');
+                mainModal.classList.remove('dark');
+            }
+        });
+    </script>
+
+</body>
+
+</html>
