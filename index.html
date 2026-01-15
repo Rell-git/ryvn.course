@@ -8,270 +8,8 @@
 
     <!-- PIXEL FONT -->
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
 
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box
-        }
-
-        html,
-        body {
-            height: 100%;
-            background: #000;
-            font-family: 'Press Start 2P', monospace;
-            overflow: hidden;
-        }
-
-        /* ================= VIDEO BG ================= */
-        .video-bg {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-        }
-
-        .video-bg video {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            min-width: 100%;
-            min-height: 100%;
-            transform: translate(-50%, -50%);
-            object-fit: cover;
-        }
-
-        /* OVERLAY */
-        .overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, .55);
-            z-index: 1;
-        }
-
-        /* ================= LANDING ================= */
-        .content {
-            position: relative;
-            z-index: 2;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            color: #fff;
-            padding: 2rem;
-        }
-
-        h1 {
-            font-size: clamp(2rem, 7vw, 4rem);
-            margin-bottom: 1.5rem
-        }
-
-        p {
-            font-size: .75rem;
-            margin-bottom: 2rem;
-            line-height: 1.6
-        }
-
-        /* BUTTON */
-        .neon-btn {
-            padding: 1rem 2rem;
-            background: #111;
-            color: #fff;
-            border: 4px solid #fff;
-            cursor: pointer;
-            box-shadow: 4px 4px 0 #555;
-        }
-
-        .neon-btn:hover {
-            transform: translate(-2px, -2px);
-            box-shadow: 6px 6px 0 #333;
-        }
-
-        /* ================= MODAL ================= */
-        .modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: #000;
-            z-index: 10;
-            overflow-y: auto;
-        }
-
-        .modal-content {
-            min-height: 100vh;
-            padding: 5rem 2rem;
-            color: #fff;
-            position: relative;
-        }
-
-        /* ================= TOGGLE ================= */
-        .toggle-container {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            cursor: pointer;
-            z-index: 5;
-        }
-
-        .toggle-switch {
-            width: 80px;
-            height: 40px;
-            border: 4px solid #fff;
-        }
-
-        .toggle-knob {
-            width: 32px;
-            height: 32px;
-            background: #fff;
-            margin: 4px;
-            transition: .3s;
-        }
-
-        .toggle-container.active .toggle-knob {
-            transform: translateX(36px);
-        }
-
-        /* ================= BOX AREA ================= */
-        .box-area {
-            position: relative;
-            margin: 6rem auto 0;
-            width: fit-content;
-        }
-
-        /* ================= SPOTLIGHT ================= */
-        .spotlight {
-            position: absolute;
-            top: -120px;
-            right: -180px;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(ellipse at top right,
-                    rgba(255, 255, 255, .55) 0%,
-                    rgba(255, 255, 255, .25) 35%,
-                    rgba(255, 255, 255, 0) 70%);
-            transform: rotate(-25deg);
-            filter: blur(35px);
-            pointer-events: none;
-            z-index: 1;
-            animation: flicker 1.5s infinite;
-        }
-
-        /* FLICKER ANIMATION */
-        @keyframes flicker {
-
-            0%,
-            100% {
-                opacity: 0.7;
-            }
-
-            10% {
-                opacity: 0.4;
-            }
-
-            20% {
-                opacity: 0.9;
-            }
-
-            30% {
-                opacity: 0.3;
-            }
-
-            40% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0.5;
-            }
-
-            60% {
-                opacity: 0.8;
-            }
-
-            70% {
-                opacity: 0.35;
-            }
-
-            80% {
-                opacity: 1;
-            }
-
-            90% {
-                opacity: 0.6;
-            }
-        }
-
-        /* BOX GRID */
-        .box-grid {
-            position: relative;
-            z-index: 3;
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1.5rem;
-        }
-
-        /* IMAGE BOX */
-        .image-btn {
-            width: 140px;
-            height: 140px;
-            background-size: cover;
-            background-position: center;
-            border: 4px solid #fff;
-            box-shadow: 8px 8px 0 #222;
-            cursor: pointer;
-            transition: .2s;
-        }
-
-        .image-btn:hover {
-            transform: translate(-3px, -3px);
-            box-shadow: 12px 12px 0 #111;
-        }
-
-        /* ================= FB CONTENT ================= */
-        .dark-content {
-            display: none;
-            margin-top: 6rem;
-            text-align: center;
-        }
-
-        .modal.dark .dark-content {
-            display: block
-        }
-
-        .modal.dark .box-area {
-            display: none
-        }
-
-        /* ================= BOX MODAL ================= */
-        #boxModal h2 {
-            font-size: .9rem;
-            margin-bottom: 2rem;
-        }
-
-        #boxModal p {
-            font-size: .7rem;
-            line-height: 1.8;
-            max-width: 700px;
-            margin: 0 auto 3rem;
-        }
-
-        /* MOBILE */
-        @media(max-width:768px) {
-            .image-btn {
-                width: 100px;
-                height: 100px
-            }
-
-            .spotlight {
-                width: 450px;
-                height: 450px;
-                top: -80px;
-                right: -120px;
-            }
-        }
-    </style>
 </head>
 
 <body>
@@ -324,6 +62,8 @@
         </div>
     </div>
 
+
+
     <!-- BOX MODAL -->
     <div id="boxModal" class="modal">
         <div class="modal-content">
@@ -333,53 +73,91 @@
         </div>
     </div>
 
+    <!-- MOVE UNIQUE MODAL HERE – outside of box-data! -->
+    <div id="uniqModal" class="modal">
+        <div class="modal-content">
+            <h2 class="uniq-title">UNIQUE MODAL TITLE</h2>
+            <p class="uniq-text">
+                Gumagana na ito 💯<br><br>
+                Fullscreen modal<br><br>
+                Scrollable kahit sobrang haba ng text<br><br>
+                Walang conflict sa ibang modal 👾
+            </p>
+            <button class="neon-btn" onclick="closeUniqModal()">CLOSE</button>
+        </div>
+    </div>
+
+    <!-- ================= BOX DATA (HTML CONTENT) ================= -->
+    <div id="box-data" style="display:none">
+        <div class="box-item" data-box="1">
+            <h2>HTML</h2>
+            <p>
+                Content for picture 1.<br><br>
+                Scrollable fullscreen text.<br><br>
+                Pwede ka magdagdag ng kahit gaano kahaba dito.
+
+                <button class="neon-btn" onclick="openUniqModal()">OPEN INFO</button>
+            </p>
+        </div>
+
+        <!-- other box items... -->
+
+    </div>
+
+
+
+
+
+
+    <div class="box-item" data-box="2">
+        <h2>PIC 2</h2>
+        <p>
+            Content for picture 2.<br><br>
+            Add anything.<br><br>
+            Text, links, etc.
+        </p>
+    </div>
+
+    <div class="box-item" data-box="3">
+        <h2>PIC 3</h2>
+        <p>
+            Content for picture 3.<br><br>
+            Images, text, etc.<br><br>
+            Mas madali na i-edit 👌
+        </p>
+    </div>
+
+    <div class="box-item" data-box="4">
+        <h2>PIC 4</h2>
+        <p>
+            Content for picture 4.<br><br>
+            Bonus zone.
+        </p>
+    </div>
+
+    </div>
+
+
+    <script src="script.js"></script>
+
+    <!-- Adsterra Popunder Scripts – place here -->
     <script>
-        const bgVideo = document.getElementById("bgVideo");
-        const bgSource = document.getElementById("bgSource");
-        const mainModal = document.getElementById("mainModal");
-        const boxModal = document.getElementById("boxModal");
-        const boxTitle = document.getElementById("boxTitle");
-        const boxText = document.getElementById("boxText");
-        const toggle = document.querySelector(".toggle-container");
-
-        /* BG SWITCH */
-        function setBG() {
-            bgSource.src = window.innerWidth <= 768 ? "bg2.mp4" : "bg1.mp4";
-            bgVideo.load();
-            bgVideo.play().catch(() => { });
-        }
-        window.addEventListener("load", setBG);
-        window.addEventListener("resize", setBG);
-
-        /* OPEN MAIN */
-        function openMain() {
-            mainModal.style.display = "block";
-        }
-
-        /* TOGGLE */
-        function toggleMode() {
-            toggle.classList.toggle("active");
-            mainModal.classList.toggle("dark");
-        }
-
-        /* BOX OPEN */
-        function openBox(n) {
-            const data = {
-                1: ["PIC 1", "Content for picture 1.\n\nScrollable fullscreen text."],
-                2: ["PIC 2", "Content for picture 2.\n\nAdd anything."],
-                3: ["PIC 3", "Content for picture 3.\n\nImages, text, etc."],
-                4: ["PIC 4", "Content for picture 4.\n\nBonus zone."]
-            };
-            boxTitle.innerText = data[n][0];
-            boxText.innerText = data[n][1];
-            boxModal.style.display = "block";
-        }
-
-        /* BACK */
-        function closeBox() {
-            boxModal.style.display = "none";
-        }
+        atOptions = {
+            'key': '6d45cdeb8cb7e39a34ca1366c9959a12',
+            'format': 'iframe',
+            'height': 90,
+            'width': 728,
+            'params': {}
+        };
     </script>
+    <script src="https://www.highperformanceformat.com/6d45cdeb8cb7e39a34ca1366c9959a12/invoke.js"></script>
+
+    <script src="https://pl28488188.effectivegatecpm.com/08/86/06/088606019de59cc0930830882dad5a41.js"></script>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
 
 </body>
 
